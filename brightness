@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+scrns=$( xrandr | grep -w connected | cut -f1 -d' ' )
+step=.1
+sign=${1:-'+'}
+
+scrn1=$( echo "$scrns" | cut -f1 -d' ' )
+curr_bright=$( xrandr --verbose | grep ^"$scrn1" -A5 | tail -n1 | cut -f2 -d' ' )
+new_bright=$( echo "$curr_bright$sign$step" | bc )
+
+if (( $(echo "$new_bright>0 && $new_bright<3.5" | bc ) )); then
+    for scrn in $scrns; do
+        xrandr --output "$scrn" --brightness "$new_bright"
+    done
+fi
